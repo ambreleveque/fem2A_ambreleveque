@@ -66,6 +66,8 @@ namespace FEM2A {
         
         void test_mapping()
         {
+        	bool border_ = border;
+        	std::cout << border_ << std::endl;
         }
         
         void test_ShapeFunc()
