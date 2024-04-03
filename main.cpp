@@ -35,7 +35,7 @@ void run_tests()
     if( t_opennl ) test_opennl();
     if( t_lmesh ) Tests::test_load_mesh();
     if( t_io ) Tests::test_load_save_mesh();
-    if( t_quadrature ) Tests::test_quadrature(2, false);
+    if( t_quadrature ) Tests::test_quadrature(0, false);
 }
 
 void run_simu()
