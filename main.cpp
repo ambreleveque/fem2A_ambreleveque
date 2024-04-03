@@ -30,12 +30,21 @@ void run_tests()
     const bool t_opennl = false;
     const bool t_lmesh = false;
     const bool t_io = false;
-    const bool t_quadrature = true;
+    const bool t_quadrature = false;
+    const bool t_map = true;
+    const bool t_SF = false;
+    const bool t_Ke = false;
+    const bool t_src_term = false;
+    const bool t_neumann = false;
 
     if( t_opennl ) test_opennl();
     if( t_lmesh ) Tests::test_load_mesh();
     if( t_io ) Tests::test_load_save_mesh();
     if( t_quadrature ) Tests::test_quadrature(0, false);
+    if( t_map ) Tests::test_mapping();
+    if( t_SF ) Tests::test_ShapeFunc();
+    if( t_Ke ) Tests::test_Ke();
+    if( t_src_term ) Tests::test_src_term();
 }
 
 void run_simu()

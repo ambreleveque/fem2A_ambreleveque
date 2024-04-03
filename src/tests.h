@@ -63,6 +63,22 @@ namespace FEM2A {
         	}
         	std::cout << sum << std::endl;
         }
+        
+        void test_mapping()
+        {
+        }
+        
+        void test_ShapeFunc()
+        {
+        }
+        
+        void test_Ke()
+        {
+        }
+        
+        void test_src_term()
+        {
+        }
 
     }
 }
