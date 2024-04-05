@@ -66,6 +66,11 @@ namespace FEM2A {
         
         void test_mapping()
         {
+        	Mesh mesh;
+        	mesh.load("data/square.mesh"): //récupère le cas square
+        	ElementMapping my_map(mesh, false, 4);
+        	vertex pt_in_ref; pt_in_ref.x = 0.2; pt_in_ref.y = 0.4;
+        	//TO DO
         	bool border_ = border;
         	std::cout << border_ << std::endl;
         }

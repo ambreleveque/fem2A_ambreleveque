@@ -132,10 +132,18 @@ namespace FEM2A {
     ElementMapping::ElementMapping( const Mesh& M, bool border, int i )
         : border_( border )
     {
-        std::cout << "[ElementMapping] constructor for element " << i << " ";
-        if ( border ) std::cout << "(border)";
-        std::cout << '\n';
-        // TODO
+    	if (border) {
+    		for (int v = 0; v < 2; v++) {
+    			vertices_.push_back(M.get_edge_vertex(i,v));
+    			std::cout << vertices_[v].x << " " << vertices[v].y << std::endl;
+    		}
+    	}
+    	else {
+    		for (int v = 0; v < 3; v++) {
+    			vertices_push_back(M.get_triangle_vertex(i,v));
+    			std::cout << vertices_[v].x << " " << vertices_[v].y << std::endl;
+    		}
+    	}
     }
 
     vertex ElementMapping::transform( vertex x_r ) const
