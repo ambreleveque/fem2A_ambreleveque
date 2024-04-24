@@ -151,10 +151,16 @@ namespace FEM2A {
     {
         std::cout << "[ElementMapping] transform reference to world space" << '\n';
         // TODO
-        vertex r ; // dans le world
-        if (border) {
-        	r.x = (1-x_r.x - x_r.y)* vertices_[0].x + x_r.x * vertices_[1].x;
-        	r.y = (1-x_r.x) * vertices_[0].y + x_r.x * vertices_[1].y;
+        vertex r ; // dans le réel
+        if (border) { //cas segment
+        	r.x = (1 - x_r.x - x_r.y)* vertices_[0].x + x_r.x * vertices_[1].x;
+        	r.y = (1 - x_r.x - x_r.y) * vertices_[0].y + x_r.x * vertices_[1].y;
+        	std::cout << "Coordonnées du vertice du segment dans le réel" << r.x << " " << r.y << '\n';
+        }
+        else { //cas triangle
+        	r.x = (1 - x_r.x - x_r.y)* vertices_[0].x + x_r.x * vertices_[1].x + x_r.y * vertices_[2].x;
+        	r.y = (1 - x_r.x - x_r.y)* vertices_[0].y + x_r.x * vertices_[1].y + x_r.y * vertices_[2].y;
+        	std::cout << "Coordonnées du vertice du triangle dans le réel" << r.x << " " << r.y << '\n';
         }
         return r ;
     }
@@ -164,6 +170,19 @@ namespace FEM2A {
         std::cout << "[ElementMapping] compute jacobian matrix" << '\n';
         // TODO
         DenseMatrix J ;
+        if (border) {
+        	J.set_size(2,1);
+        	J.set(0,0, -vertices_[0].x + vertices_[1].x);
+        	J.set(1,0, -vertices_[0].y + vertices_[1].y);
+        }
+        else {
+        	J.set_size(2,2);
+        	J.set(0,0,vertices_[1].x - vertices_[0].x);
+        	J.set(1,0,vertices_[1].y - vertices_[0].y);
+        	J.set(0,1,vertices_[2].x - vertices_[0].x);
+        	J.set(1,1,vertices_[2].y - vertices_[0].y);
+        }
+        std::cout << "La matrice jacobienne est : " << J << '\n';
         return J ;
     }
 
@@ -171,7 +190,16 @@ namespace FEM2A {
     {
         std::cout << "[ElementMapping] compute jacobian determinant" << '\n';
         // TODO
-        return 0. ;
+        DenseMatrix J = jacobian_matrix(x_r);
+        if (border) {
+        	DenseMatrix T = J.transpose();
+        	produit = J.get(0,0)*T.get(0,0) + J.get(1,0)*T.get(0,1)
+        	det = sqrt(produit);
+        }
+        else {
+        	det = J.det2x2();
+        }
+        return det;
     }
 
     /****************************************************************/
