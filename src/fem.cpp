@@ -193,8 +193,8 @@ namespace FEM2A {
         DenseMatrix J = jacobian_matrix(x_r);
         if (border) {
         	DenseMatrix T = J.transpose();
-        	produit = J.get(0,0)*T.get(0,0) + J.get(1,0)*T.get(0,1)
-        	det = sqrt(produit);
+        	float produit = J.get(0,0)*T.get(0,0) + J.get(1,0)*T.get(0,1)
+        	float det = sqrt(produit);
         }
         else {
         	det = J.det2x2();
@@ -210,12 +210,19 @@ namespace FEM2A {
     {
         std::cout << "[ShapeFunctions] constructor in dimension " << dim << '\n';
         // TODO
+        if 
     }
 
     int ShapeFunctions::nb_functions() const
     {
         std::cout << "[ShapeFunctions] number of functions" << '\n';
         // TODO
+        if (dim_ = 1) {
+        	int nb_shape_func = 2;
+        }
+        else {
+        	int nb_s
+        }
         return 0 ;
     }
 
