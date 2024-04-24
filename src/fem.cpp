@@ -130,18 +130,19 @@ namespace FEM2A {
     /* Implementation of ElementMapping */
     /****************************************************************/
     ElementMapping::ElementMapping( const Mesh& M, bool border, int i )
-        : border_( border )
+        : border_( border ) //constructeur d'ElementMapping
     {
-    	if (border) {
-    		for (int v = 0; v < 2; v++) {
-    			vertices_.push_back(M.get_edge_vertex(i,v));
-    			std::cout << vertices_[v].x << " " << vertices[v].y << std::endl;
+    	if (border) std::cout << "(border)"; // s'il y a border alors segment
+    	std::cout << '\n';
+    	
+    	if (border) { // cas d'un segment donc max que deux vertices = deux points
+    		for (int v = 0; v_local_index < 2; v_local_index++) { //on note v le vertex local index
+    			vertices_.push_back(M.get_edge_vertex(i,v_local_index));
     		}
     	}
-    	else {
-    		for (int v = 0; v < 3; v++) {
-    			vertices_push_back(M.get_triangle_vertex(i,v));
-    			std::cout << vertices_[v].x << " " << vertices_[v].y << std::endl;
+    	else { //cas d'un triangle donc trois vertices
+    		for (int v = 0; v_local_index < 3; v_local_index++) {
+    			vertices.push_back(M.get_triangle_vertex(i,v_local_index));
     		}
     	}
     }
@@ -150,7 +151,11 @@ namespace FEM2A {
     {
         std::cout << "[ElementMapping] transform reference to world space" << '\n';
         // TODO
-        vertex r ;
+        vertex r ; // dans le world
+        if (border) {
+        	r.x = (1-x_r.x - x_r.y)* vertices_[0].x + x_r.x * vertices_[1].x;
+        	r.y = (1-x_r.x) * vertices_[0].y + x_r.x * vertices_[1].y;
+        }
         return r ;
     }
 
