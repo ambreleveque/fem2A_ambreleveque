@@ -136,41 +136,41 @@ namespace FEM2A {
     	std::cout << '\n';
     	
     	if (border) { // cas d'un segment donc max que deux vertices = deux points
-    		for (int v = 0; v_local_index < 2; v_local_index++) { //on note v le vertex local index
+    		for (int v_local_index = 0; v_local_index < 2; v_local_index++) { //on note v le vertex local index
     			vertices_.push_back(M.get_edge_vertex(i,v_local_index));
     		}
     	}
     	else { //cas d'un triangle donc trois vertices
-    		for (int v = 0; v_local_index < 3; v_local_index++) {
-    			vertices.push_back(M.get_triangle_vertex(i,v_local_index));
+    		for (int v_local_index = 0; v_local_index < 3; v_local_index++) {
+    			vertices_.push_back(M.get_triangle_vertex(i,v_local_index));
     		}
     	}
     }
 
     vertex ElementMapping::transform( vertex x_r ) const
     {
-        std::cout << "[ElementMapping] transform reference to world space" << '\n';
-        // TODO
+        std::cout << "[ElementMapping] transform reference to world space " << '\n';
+        
         vertex r ; // dans le réel
-        if (border) { //cas segment
+        if (border_) { //cas segment
         	r.x = (1 - x_r.x - x_r.y)* vertices_[0].x + x_r.x * vertices_[1].x;
         	r.y = (1 - x_r.x - x_r.y) * vertices_[0].y + x_r.x * vertices_[1].y;
-        	std::cout << "Coordonnées du vertice du segment dans le réel" << r.x << " " << r.y << '\n';
+        	std::cout << "Coordonnées du vertice du segment dans le réel " << r.x << " " << r.y << '\n';
         }
         else { //cas triangle
         	r.x = (1 - x_r.x - x_r.y)* vertices_[0].x + x_r.x * vertices_[1].x + x_r.y * vertices_[2].x;
         	r.y = (1 - x_r.x - x_r.y)* vertices_[0].y + x_r.x * vertices_[1].y + x_r.y * vertices_[2].y;
-        	std::cout << "Coordonnées du vertice du triangle dans le réel" << r.x << " " << r.y << '\n';
+        	std::cout << "Coordonnées du vertice du triangle dans le réel " << r.x << " " << r.y << '\n';
         }
         return r ;
     }
 
     DenseMatrix ElementMapping::jacobian_matrix( vertex x_r ) const
     {
-        std::cout << "[ElementMapping] compute jacobian matrix" << '\n';
-        // TODO
+        std::cout << "[ElementMapping] compute jacobian matrix " << '\n';
+ 
         DenseMatrix J ;
-        if (border) {
+        if (border_) {
         	J.set_size(2,1);
         	J.set(0,0, -vertices_[0].x + vertices_[1].x);
         	J.set(1,0, -vertices_[0].y + vertices_[1].y);
@@ -182,24 +182,24 @@ namespace FEM2A {
         	J.set(0,1,vertices_[2].x - vertices_[0].x);
         	J.set(1,1,vertices_[2].y - vertices_[0].y);
         }
-        std::cout << "La matrice jacobienne est : " << J << '\n';
         return J ;
     }
 
     double ElementMapping::jacobian( vertex x_r ) const
     {
-        std::cout << "[ElementMapping] compute jacobian determinant" << '\n';
-        // TODO
+        std::cout << "[ElementMapping] compute jacobian determinant " << '\n';
+ 
         DenseMatrix J = jacobian_matrix(x_r);
-        if (border) {
+        if (border_) {
         	DenseMatrix T = J.transpose();
-        	float produit = J.get(0,0)*T.get(0,0) + J.get(1,0)*T.get(0,1)
+        	float produit = J.get(0,0)*T.get(0,0) + J.get(1,0)*T.get(0,1);
         	float det = sqrt(produit);
+        	return det;
         }
         else {
-        	det = J.det2x2();
+        	float det = J.det_2x2();
+        	return det;
         }
-        return det;
     }
 
     /****************************************************************/
@@ -210,20 +210,17 @@ namespace FEM2A {
     {
         std::cout << "[ShapeFunctions] constructor in dimension " << dim << '\n';
         // TODO
-        if 
     }
 
     int ShapeFunctions::nb_functions() const
     {
         std::cout << "[ShapeFunctions] number of functions" << '\n';
-        // TODO
-        if (dim_ = 1) {
-        	int nb_shape_func = 2;
-        }
+        if (dim_ == 1) {
+        	return 1;
+	}
         else {
-        	int nb_s
-        }
-        return 0 ;
+        	return 3;
+	}
     }
 
     double ShapeFunctions::evaluate( int i, vertex x_r ) const

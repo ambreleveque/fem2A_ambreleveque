@@ -67,16 +67,35 @@ namespace FEM2A {
         void test_mapping()
         {
         	Mesh mesh;
-        	mesh.load("data/square.mesh"): //récupère le cas square
-        	ElementMapping my_map(mesh, false, 4);
-        	vertex pt_in_ref; pt_in_ref.x = 0.2; pt_in_ref.y = 0.4;
-        	//TO DO
-        	bool border_ = border;
-        	std::cout << border_ << std::endl;
+        	mesh.load("data/square.mesh"); //récupère le cas square
+        	ElementMapping mapping(mesh, false, 4);
+        	vertex point_ref; 
+        	point_ref.x = 0.2; 
+        	point_ref.y = 0.4;
+        	
+        	// Test de la méthode transform
+        	std::cout << mapping.transform(point_ref).x << " " << mapping.transform(point_ref).y << '\n';
+        	
+        	// Test de la méthode jacobian_matrix
+        	mapping.jacobian_matrix(point_ref).print();
+        	
+        	// Test de la méthode jacobian
+        	std::cout << mapping.jacobian(point_ref) << '\n';
         }
         
         void test_ShapeFunc()
         {
+        	vertex point_ref; 
+        	point_ref.x = 0.1; 
+        	point_ref.y = 0.6;
+        	
+        	// Cas d'un segment
+        	ShapeFunctions shape_f_segment(1,1);
+        	std::cout << shape_f_segment.nb_functions() << '\n';
+        	
+        	// Cas d'un triangle
+        	ShapeFunctions shape_f_triangle(2,1);
+        	std::cout << shape_f_triangle.nb_functions() << '\n';
         }
         
         void test_Ke()

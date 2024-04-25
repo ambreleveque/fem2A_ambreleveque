@@ -112,7 +112,7 @@ namespace FEM2A {
              * \param dim 1 for reference segment, 2 for reference triangle
              * \param order Should be 1 (linear functions only)
              */
-            ShapeFunctions( int dim, int order ) ;
+            ShapeFunctions( int dim, int order );
 
             /**
              * \brief Number of shape functions
