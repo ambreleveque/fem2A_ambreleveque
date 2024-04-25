@@ -31,8 +31,8 @@ void run_tests()
     const bool t_lmesh = false;
     const bool t_io = false;
     const bool t_quadrature = false;
-    const bool t_map = true;
-    const bool t_SF = false;
+    const bool t_map = false;
+    const bool t_SF = true;
     const bool t_Ke = false;
     const bool t_src_term = false;
     const bool t_neumann = false;

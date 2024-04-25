@@ -153,8 +153,8 @@ namespace FEM2A {
         
         vertex r ; // dans le réel
         if (border_) { //cas segment
-        	r.x = (1 - x_r.x - x_r.y)* vertices_[0].x + x_r.x * vertices_[1].x;
-        	r.y = (1 - x_r.x - x_r.y) * vertices_[0].y + x_r.x * vertices_[1].y;
+        	r.x = (1 - x_r.x) * vertices_[0].x + x_r.x * vertices_[1].x;
+        	r.y = (1 - x_r.x) * vertices_[0].y + x_r.x * vertices_[1].y;
         	std::cout << "Coordonnées du vertice du segment dans le réel " << r.x << " " << r.y << '\n';
         }
         else { //cas triangle
@@ -209,7 +209,12 @@ namespace FEM2A {
         : dim_( dim ), order_( order )
     {
         std::cout << "[ShapeFunctions] constructor in dimension " << dim << '\n';
-        // TODO
+        if (dim_ != 1 && dim != 2) {
+        	std::cout << "Attention, vous avez entré une mauvaise dimension" << '\n';
+        }
+        if (order_ != 1) {
+        	std::cout << "Attention, vous avez entré un ordre supérieur à 1" << '\n';
+        }
     }
 
     int ShapeFunctions::nb_functions() const
@@ -226,15 +231,51 @@ namespace FEM2A {
     double ShapeFunctions::evaluate( int i, vertex x_r ) const
     {
         std::cout << "[ShapeFunctions] evaluate shape function " << i << '\n';
-        // TODO
-        return 0. ; // should not be reached
+        if (dim_ ==1) {
+        	switch(i) {
+        		case 0 :
+        			return 1 - x_r.x ;
+        		break;
+        		case 1 :
+        			return x_r.x ;
+        		break;
+        	}
+        }		
+        else {
+        	switch(i) {
+        		case 0 :
+        			return 1 - x_r.x - x_r.y ; break;
+        		case 1 :
+        			return x_r.x ; break;
+        		case 2 :
+        			return x_r.y ; break;
+        	}
+        }
     }
 
     vec2 ShapeFunctions::evaluate_grad( int i, vertex x_r ) const
     {
         std::cout << "[ShapeFunctions] evaluate gradient shape function " << i << '\n';
-        // TODO
         vec2 g ;
+        
+        if (dim_==1) {
+        	switch(i) {
+        		case 0 :
+        			g.x = -1 ; break;
+        		case 1 :
+        			g.x = 1 ; break;
+        	}
+        }
+        else {
+        	switch(i) {
+        		case 0 :
+        			g.x = -1 ; g.y = -1 ; break;
+        		case 1 :
+        			g.x = 1 ; g.y = 0 ; break;
+        		case 2 :
+        			g.x = 0 ; g.y = 1 ; break;
+        	}
+        }
         return g ;
     }
 

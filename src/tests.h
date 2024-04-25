@@ -87,15 +87,25 @@ namespace FEM2A {
         {
         	vertex point_ref; 
         	point_ref.x = 0.1; 
-        	point_ref.y = 0.6;
+        	point_ref.y = 0.4;
         	
         	// Cas d'un segment
         	ShapeFunctions shape_f_segment(1,1);
         	std::cout << shape_f_segment.nb_functions() << '\n';
+        	std::cout << "Shape function d'indice 0 : " << shape_f_segment.evaluate(0,point_ref) << '\n';
+        	std::cout << "Shape function d'indice 1 : " << shape_f_segment.evaluate(1,point_ref) << '\n';
+        	std::cout << "Vecteur gradient de la shape function d'indice 0 : " << shape_f_segment.evaluate_grad(0,point_ref).x << " " << shape_f_segment.evaluate_grad(0,point_ref).y << '\n';
+        	std::cout << "Vecteur gradient de la shape function d'indice 1 : " << shape_f_segment.evaluate_grad(1,point_ref).x << " " << shape_f_segment.evaluate_grad(1,point_ref).y << '\n';
         	
         	// Cas d'un triangle
         	ShapeFunctions shape_f_triangle(2,1);
         	std::cout << shape_f_triangle.nb_functions() << '\n';
+        	std::cout << "Shape function d'indice 0 : " << shape_f_triangle.evaluate(0,point_ref) << '\n';
+        	std::cout << "Shape function d'indice 1 : " << shape_f_triangle.evaluate(1,point_ref) << '\n';
+        	std::cout << "Shape function d'indice 2 : " << shape_f_triangle.evaluate(2,point_ref) << '\n';
+        	std::cout << "Vecteur gradient de la shape function d'indice 0 : " << shape_f_triangle.evaluate_grad(0,point_ref).x << " " << shape_f_triangle.evaluate_grad(0,point_ref).y << '\n';
+        	std::cout << "Vecteur gradient de la shape function d'indice 1 : " << shape_f_triangle.evaluate_grad(1,point_ref).x << " " << shape_f_triangle.evaluate_grad(1,point_ref).y << '\n';
+        	std::cout << "Vecteur gradient de la shape function d'indice 2 : " << shape_f_triangle.evaluate_grad(2,point_ref).x << " " << shape_f_triangle.evaluate_grad(2,point_ref).y << '\n';
         }
         
         void test_Ke()
