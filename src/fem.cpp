@@ -309,7 +309,6 @@ namespace FEM2A {
         }
     }
 
-//commentaires
     void local_to_global_matrix(
         const Mesh& M,
         int t,
@@ -319,6 +318,7 @@ namespace FEM2A {
         std::cout << "Ke -> K" << '\n';
         // taille de K est le nbre de points d'interpolation globale, ie nbre de points du maillage
         for (int ligne = 0; ligne < Ke.height(); ++ligne){
+        	// parcours de la matrice Ke sur ses lignes et colonnes et récupération des indices
         	int i = M.get_triangle_vertex_index(t, ligne);
         	for(int colonne = 0; colonne < Ke.width(); ++colonne){
         		int j = M.get_triangle_vertex_index(t, colonne);
