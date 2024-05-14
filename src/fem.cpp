@@ -282,6 +282,7 @@ namespace FEM2A {
     /****************************************************************/
     /* Implementation of Finite Element functions */
     /****************************************************************/
+    
     void assemble_elementary_matrix(
         const ElementMapping& elt_mapping,
         const ShapeFunctions& reference_functions,
@@ -290,23 +291,25 @@ namespace FEM2A {
         DenseMatrix& Ke )
     {
         std::cout << "compute elementary matrix" << '\n';
+        // taille Ke est le nbre de points d'interpolation
         Ke.set_size(reference_functions.nb_functions(), reference_functions());
         for (int i=0; i < reference_functions.nb_functions(), ++i){
         	for (int j = 0; j < reference_functions.nb_functions(), ++j){
         		Ke.set(i, j, 0.);
         		for (int k = 0; k < quadrature.nb_points(); ++k){
-        			vertex p_k = quadrature.point(k);
-        			double w_k = quadrature.weight(k);
-        			DenseMatrix inv_J = elt_mapping.jacobian_matrix(p_k).invert_2x2();
-        			vec2 grad_i = inv_J.transpose().mult_2x2_2(reference_functions.evaluate_grad(i, p_k);
-        			vec2 grad_j = inv_J.transpose().mult_2x2_2(reference_functions.evaluate_grad(j, p_k);
-        			// TODOOOOOOOOOOOOOOOOO
-        			Ke.add(i, j, w_k * coefficient(elt_mapping.transposing(p_k)) * dot(grad_i, grad_j) * elt_mapping.jacobian(p_k));
+        			// points de gauss = points de la quadrature sur lesquels la somme de Ke est réalisée
+        			vertex ptg_q = quadrature.point(k);
+        			DenseMatrix J = elt_mapping.jacobian_matrix(ptg_q);
+        			DenseMatrix inv_J = J.invert_2x2().transpose();
+        			vec2 grad_i = reference_functions.evaluate_grad(i, ptg_q);
+        			vec2 grad_j = reference_functions.evaluate_grad(j, ptg_q);
+        			Ke.add(i, j, quadrature.weight(k) * coefficient(elt_mapping.transposing(ptg_q)) * dot(inv_J.mult_2x2_2(grad_i), inv_J.mult_2x2_2(grad_j)) * elt_mapping.jacobian(ptg_q));
         		}
         	}
         }
     }
 
+//commentaires
     void local_to_global_matrix(
         const Mesh& M,
         int t,
@@ -314,16 +317,16 @@ namespace FEM2A {
         SparseMatrix& K )
     {
         std::cout << "Ke -> K" << '\n';
-        for (int li = 0; li < ke.height(); ++li){
-        	int i = M.get_triangle_vertex_index(t, li);
-        	for(int lj = 0; lj < ke.width(); ++lj){
-        		int j = M.get_triangle_vertex_index(t, lj);
-        		K.add(i, j, Ke.get(li, lj));
+        // taille de K est le nbre de points d'interpolation globale, ie nbre de points du maillage
+        for (int ligne = 0; ligne < Ke.height(); ++ligne){
+        	int i = M.get_triangle_vertex_index(t, ligne);
+        	for(int colonne = 0; colonne < Ke.width(); ++colonne){
+        		int j = M.get_triangle_vertex_index(t, colonne);
+        		K.add(i, j, Ke.get(ligne, colonne));
         	}
         }
     }
     
-    //TODO pour Dirichlet avec terme source
     void assemble_elementary_vector(
         const ElementMapping& elt_mapping,
         const ShapeFunctions& reference_functions,
@@ -332,9 +335,17 @@ namespace FEM2A {
         std::vector< double >& Fe )
     {
         std::cout << "compute elementary vector (source term)" << '\n';
-        // TODO
+        for (int i = 0; i < reference_functions.nb_functions(); ++i) {
+        	for (int k = 0; k < quadrature.nb_points(); ++k) {
+        		const vertex ptg_q = quadrature.point(k);
+        		//On redimensionne Fe et on la rempli avec 0 au début puis avec les valeurs de la boucle
+        		Fe[i] += quadrature.weight(k) * source(elt_mapping.transform(ptg_q)) * reference_functions.evaluate(i, ptg_q) * elt_mapping.jacobian(ptg_q);
+        		std::cout << "Calcul de la somme" << '\n';
+        	}
+        }
     }
-
+    
+// Condition de Neumann non realisee
     void assemble_elementary_neumann_vector(
         const ElementMapping& elt_mapping_1D,
         const ShapeFunctions& reference_functions_1D,
@@ -346,7 +357,6 @@ namespace FEM2A {
         // TODO
     }
 
- //TODO pour Dirichlet avec terme source
     void local_to_global_vector(
         const Mesh& M,
         bool border,
@@ -355,9 +365,23 @@ namespace FEM2A {
         std::vector< double >& F )
     {
         std::cout << "Fe -> F" << '\n';
-        // TODO
+        
+        // condition d'un segment
+        if (border) {
+        	// parcours des lignes de la matrice Fe pour récupérer les index
+        	for ( int ligne = 0; ligne < Fe.size(); ++ligne) {
+        		F[M.get_edge_vertex_index(i, ligne)] += Fe[ligne];
+        	}
+        }
+        // condition d'un triangle
+        else {
+        	// parcours des lignes de la matrice Fe
+        	for ( int ligne = 0; ligne < Fe.size(); ++ligne){
+        		F[M.get_triangle_vertex_index(i, ligne)] += Fe[ligne];
+        	}
+        }
     }
-
+    
     void apply_dirichlet_boundary_conditions(
         const Mesh& M,
         const std::vector< bool >& attribute_is_dirichlet, /* size: nb of attributes */
@@ -367,12 +391,28 @@ namespace FEM2A {
     {
         std::cout << "apply dirichlet boundary conditions" << '\n';
         std::vector<bool> processed_vertices(values.size(), false);
-        double coeff_p = 10000.;
-        for (int edge = 0; edge < M.nb_edges(); ++edges){
-        	
+        double penalty_coefficient = 10000.;
+        
+       // parcours de chaque segment
+        for (int edge = 0; edge < M.nb_edges(); ++edges) {
+        	int edge_attribute = M.get_edge_attribute(edge);
+        	if ( attribute_is_dirichlet[edge_attribute] ) {
+        		// parcours de chaque noued de chaque segment
+        		for (int n = 0; n < 2; ++n){
+      				// application de la condition de Dirichlet
+        			int vertex_index = M.get_edge_vertex_index(edge,n);
+        			// condition de vérification qu'un noeud est traité qu'une seule fois
+        			if ( !processed_vertices[vertex_index] ) {
+        				processed_vertices[vertex_index] = true;
+        				K.add(vertex_index, vertex_index, penalty_coefficient);
+        				F[vertex_index] += penalty_coefficient * values[vertex_index];
+        			}
+        		}
+        	}
         }
     }
 
+// Non realisee
     void solve_poisson_problem(
             const Mesh& M,
             double (*diffusion_coef)(vertex),
