@@ -290,7 +290,21 @@ namespace FEM2A {
         DenseMatrix& Ke )
     {
         std::cout << "compute elementary matrix" << '\n';
-        // TODO
+        Ke.set_size(reference_functions.nb_functions(), reference_functions());
+        for (int i=0; i < reference_functions.nb_functions(), ++i){
+        	for (int j = 0; j < reference_functions.nb_functions(), ++j){
+        		Ke.set(i, j, 0.);
+        		for (int k = 0; k < quadrature.nb_points(); ++k){
+        			vertex p_k = quadrature.point(k);
+        			double w_k = quadrature.weight(k);
+        			DenseMatrix inv_J = elt_mapping.jacobian_matrix(p_k).invert_2x2();
+        			vec2 grad_i = inv_J.transpose().mult_2x2_2(reference_functions.evaluate_grad(i, p_k);
+        			vec2 grad_j = inv_J.transpose().mult_2x2_2(reference_functions.evaluate_grad(j, p_k);
+        			// TODOOOOOOOOOOOOOOOOO
+        			Ke.add(i, j, w_k * coefficient(elt_mapping.transposing(p_k)) * dot(grad_i, grad_j) * elt_mapping.jacobian(p_k));
+        		}
+        	}
+        }
     }
 
     void local_to_global_matrix(
@@ -300,9 +314,16 @@ namespace FEM2A {
         SparseMatrix& K )
     {
         std::cout << "Ke -> K" << '\n';
-        // TODO
+        for (int li = 0; li < ke.height(); ++li){
+        	int i = M.get_triangle_vertex_index(t, li);
+        	for(int lj = 0; lj < ke.width(); ++lj){
+        		int j = M.get_triangle_vertex_index(t, lj);
+        		K.add(i, j, Ke.get(li, lj));
+        	}
+        }
     }
-
+    
+    //TODO pour Dirichlet avec terme source
     void assemble_elementary_vector(
         const ElementMapping& elt_mapping,
         const ShapeFunctions& reference_functions,
@@ -325,6 +346,7 @@ namespace FEM2A {
         // TODO
     }
 
+ //TODO pour Dirichlet avec terme source
     void local_to_global_vector(
         const Mesh& M,
         bool border,
@@ -344,7 +366,11 @@ namespace FEM2A {
         std::vector< double >& F )
     {
         std::cout << "apply dirichlet boundary conditions" << '\n';
-        // TODO
+        std::vector<bool> processed_vertices(values.size(), false);
+        double coeff_p = 10000.;
+        for (int edge = 0; edge < M.nb_edges(); ++edges){
+        	
+        }
     }
 
     void solve_poisson_problem(
