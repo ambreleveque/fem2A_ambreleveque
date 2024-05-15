@@ -194,10 +194,12 @@ namespace FEM2A {
         	DenseMatrix T = J.transpose();
         	float produit = J.get(0,0)*T.get(0,0) + J.get(1,0)*T.get(0,1);
         	float det = sqrt(produit);
+        	std::cout << "Le determinant est : " << det << '\n';
         	return det;
         }
         else {
         	float det = J.det_2x2();
+        	std::cout << "Le determinant est : " << det << '\n';
         	return det;
         }
     }
