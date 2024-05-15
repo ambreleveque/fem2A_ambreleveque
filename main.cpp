@@ -59,7 +59,9 @@ void run_simu()
     if( simu_pure_dirichlet ) {
         Simu::pure_dirichlet_pb("data/square.mesh", verbose);
     }
-    
+    if( simu_dirichlet_source_term ) {
+    	Simu::dirichlet_with_src_pb("data/square.mesh", verbose);
+    }
     if( simu_dirichlet_source_term ) {
     	Simu::dirichlet_with_src_pb("data/square_fine.mesh", verbose);
     }
