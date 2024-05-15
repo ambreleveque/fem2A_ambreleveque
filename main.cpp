@@ -27,20 +27,21 @@ using namespace FEM2A;
 
 void run_tests()
 {
-    const bool t_opennl = false;
-    const bool t_lmesh = false;
-    const bool t_io = false;
-    const bool t_quadrature = false;
-    const bool t_map = false;
+    const bool t_opennl = true;
+    const bool t_lmesh = true;
+    const bool t_io = true;
+    const bool t_quadrature = true;
+    const bool t_map = true;
     const bool t_SF = true;
-    const bool t_Ke = false;
-    const bool t_src_term = false;
+    const bool t_Ke = true;
+    const bool t_src_term = true;
     const bool t_neumann = false;
 
     if( t_opennl ) test_opennl();
     if( t_lmesh ) Tests::test_load_mesh();
     if( t_io ) Tests::test_load_save_mesh();
     if( t_quadrature ) Tests::test_quadrature(0, false);
+    if( t_quadrature ) Tests::test_quadrature(2, false);
     if( t_map ) Tests::test_mapping();
     if( t_SF ) Tests::test_ShapeFunc();
     if( t_Ke ) Tests::test_Ke();
@@ -51,12 +52,17 @@ void run_simu()
 {
 
     const bool simu_pure_dirichlet = true;
+    const bool simu_dirichlet_source_term = true;
 
     const bool verbose = flag_is_used( "-v", arguments )
         || flag_is_used( "--verbose", arguments );
 
     if( simu_pure_dirichlet ) {
         Simu::pure_dirichlet_pb("data/square.mesh", verbose);
+    }
+    
+    if( simu_dirichlet_source_term ) {
+    	Simu::dirichlet_with_src_pb("data/square_fine.mesh", verbose);
     }
 }
 
