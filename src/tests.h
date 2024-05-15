@@ -55,7 +55,7 @@ namespace FEM2A {
         void test_quadrature(int order, bool border)
         { 
         	Quadrature quad = Quadrature::get_quadrature(order, border);
-        	std::cout << quad.nb_points() << std::endl;
+        	std::cout << "Le nombre de points de la quadrature est : " << quad.nb_points() << std::endl;
         	double sum = 0;
         	for ( int i = 0; i < quad.nb_points(); ++i) {
         		std::cout << quad.point(i).x << " " << quad.point(i).y << std::endl;
